@@ -101,6 +101,33 @@ export default function App() {
     setNodos((listaAnterior) => listaAnterior.filter(nodo => nodo.id !== idParaBorrar));
   }
 
+  // =========================================================
+  // TU NUEVA FUNCIÓN DE EDITAR (EL CAMIÓN DE ACTUALIZACIÓN)
+  // =========================================================
+  async function dispararEdicion(idParaEditar) {
+    // 1. Le pedimos al usuario el nuevo texto
+    const nuevoServicio = window.prompt("Escribe el nuevo nombre del servicio:");
+    
+    // Si el usuario cancela o lo deja vacío, detenemos la función
+    if (!nuevoServicio) return; 
+
+    // 2. El camión sale hacia Node.js
+    await fetch(`http://localhost:3001/api/nodos/${idParaEditar}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ servicio_nombre: nuevoServicio })
+    });
+
+    // 3. Actualizamos la memoria de React (la pantalla)
+    // Recorremos la lista: si es el nodo que editamos, le cambiamos el nombre. Si no, lo dejamos igual.
+    setNodos((listaAnterior) => 
+      listaAnterior.map(nodo => 
+        nodo.id === idParaEditar ? { ...nodo, servicio_nombre: nuevoServicio } : nodo
+      )
+    );
+  }
+
+
 // =========================================================
   // TU NUEVA FUNCIÓN DE EDITAR (EL CAMIÓN DE ACTUALIZACIÓN)
   // =========================================================
@@ -161,9 +188,10 @@ export default function App() {
             key={nodo.id}
             ip={nodo.host_ip}
             servicio={nodo.servicio_nombre}
-            // RETO FINAL: ¿Cómo conectas la propiedad 'alHacerClick' del molde
-            // con la función 'dispararEliminacion' pasándole el 'nodo.id'?
-            alHacerClick={() => dispararEliminacion(nodo.id) } 
+            alHacerClick={() => dispararEliminacion(nodo.id)} 
+            
+            // RETO: ¿Cómo conectas este nuevo gatillo usando la regla del seguro () => ?
+            alHacerClickEditar={ () => dispararEdicion(nodo.id) }
           />    
         )
       })}
